@@ -1,0 +1,38 @@
+version: "3"
+
+services:
+  postgres:
+    image: docker.io/library/postgres:15
+    environment:
+      POSTGRES_USER: data
+      POSTGRES_PASSWORD: data
+      POSTGRES_DB: warehouse
+    ports:
+      - "5432:5432"
+    networks:
+      - data-net
+
+  python:
+    build: .
+    depends_on:
+      - postgres
+    networks:
+      - data-net
+
+  airflow:
+    image: apache/airflow:2.7.1
+    environment:
+      AIRFLOW__CORE__LOAD_EXAMPLES: 'False'
+      AIRFLOW__CORE__EXECUTOR: 'SequentialExecutor'
+      AIRFLOW__DATABASE__SQL_ALCHEMY_CONN: 'postgresql+psycopg2://data:data@postgres:5432/warehouse'
+    ports:
+      - "8080:8080"
+    volumes:
+      - ./dags:/opt/airflow/dags
+    depends_on:
+      - postgres
+    networks:
+      - data-net
+
+networks:
+  data-net:
