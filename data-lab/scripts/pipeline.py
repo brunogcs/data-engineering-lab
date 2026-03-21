@@ -10,10 +10,11 @@ data = [
 df = pd.DataFrame(data)
 
 conn = psycopg2.connect(
-    host="localhost",
-    database="warehouse",
+    host="host.docker.internal",
+    port=5432,
     user="data",
-    password="data"
+    password="data",
+    database="warehouse"
 )
 
 cursor = conn.cursor()
