@@ -1,3 +1,4 @@
+#docker-compose up -d
 version: "3"
 
 services:
@@ -11,13 +12,13 @@ services:
       - "5432:5432"
     networks:
       - data-net
-
-  python:
-    build: .
-    depends_on:
-      - postgres
-    networks:
-      - data-net
+  
+  #python:
+  #  build: .
+  #  depends_on:
+  #    - postgres
+  #  networks:
+  #    - data-net
 
   airflow:
     image: apache/airflow:2.7.1
@@ -33,6 +34,23 @@ services:
       - postgres
     networks:
       - data-net
+
+  devcontainer:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    volumes:
+      - ..:/workspace
+    working_dir: /workspace
+    networks:
+      - data-net
+    environment:
+      - PYTHONUNBUFFERED=1
+    depends_on:
+      - postgres
+      - airflow
+    stdin_open: true
+    tty: true
 
 networks:
   data-net:

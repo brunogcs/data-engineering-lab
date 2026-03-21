@@ -1,0 +1,15 @@
+{
+ "name": "data-lab",
+ "dockerComposeFile": "../.dockercompose/docker-compose.yml",
+ "service": "devcontainer",
+ "workspaceFolder": "/workspace",
+ "customizations": {
+  "vscode": {
+   "extensions": [
+    "ms-python.python",
+    "ms-python.vscode-pylance",
+    "Apache.airflow"
+   ]
+  }
+ }
+}
