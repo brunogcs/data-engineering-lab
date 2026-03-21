@@ -2,7 +2,7 @@
  "name": "data-lab",
  "dockerComposeFile": "../.dockercompose/docker-compose.yml",
  "service": "devcontainer",
- "workspaceFolder": "/workspace",
+ "workspaceFolder": "/workspaces",
  "customizations": {
   "vscode": {
    "extensions": [

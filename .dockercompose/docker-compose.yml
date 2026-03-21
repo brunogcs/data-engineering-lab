@@ -37,8 +37,8 @@ services:
       context: .
       dockerfile: Dockerfile
     volumes:
-      - ..:/workspaces/workspace
-    working_dir: /workspaces/workspace
+      - ..:/workspaces
+    working_dir: /workspaces
     networks:
       - data-net
     environment:
