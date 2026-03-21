@@ -4,6 +4,7 @@ version: "3"
 services:
   postgres:
     image: docker.io/library/postgres:15
+    container_name: data_lab_postgres
     environment:
       POSTGRES_USER: data
       POSTGRES_PASSWORD: data
@@ -12,16 +13,10 @@ services:
       - "5432:5432"
     networks:
       - data-net
-  
-  #python:
-  #  build: .
-  #  depends_on:
-  #    - postgres
-  #  networks:
-  #    - data-net
 
   airflow:
     image: apache/airflow:2.7.1
+    container_name: data_lab_airflow
     environment:
       AIRFLOW__CORE__LOAD_EXAMPLES: 'False'
       AIRFLOW__CORE__EXECUTOR: 'SequentialExecutor'
@@ -36,6 +31,8 @@ services:
       - data-net
 
   devcontainer:
+    image: docker.io/library/python:3.11-slim
+    container_name: data_lab_devcontainer
     build:
       context: .
       dockerfile: Dockerfile
