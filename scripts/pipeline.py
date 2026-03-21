@@ -10,7 +10,7 @@ data = [
 df = pd.DataFrame(data)
 
 conn = psycopg2.connect(
-    host="host.docker.internal",
+    host="postgres",
     port=5432,
     user="data",
     password="data",
