@@ -1,0 +1,46 @@
+# Introdução:
+estou tentando montar um ambiente de produção para endenharia de dados.
+ele precisa ser o mais fidedigno possivel com relação ao ambiente que as grandes empresas usam hoje no mercado.
+
+#Como eu quero fazer
+O ambiente precisa ser fidedigno mas tem um porém, quero que ele seja local na minha maquina,
+mas simule o ambiente de nuvem, onde eu precise fazer passos iguais ou similares que encontrarei nas empresas.
+NO meu ambiente não quero depender de serviço de nuvem aws, azure, google cloud, etc...
+Não quero depender porque plano free de teste deles é limitado, eu quero ter um ambiente para usar livremente.
+
+# O que Já fiz
+Eu já configurei meu ubuntu server.
+Eu já configurei meu vscode para conectar ao ubuntu server via ssh.
+Eu já configurei um projeto especifico para rodar em container python dentro do ubuntu server via ssh.
+Eu já configurei também container postgres para rodar meu código python que faz inserção nele.
+
+# O que está nos planos de fazer:
+
+Configurar serviços incluídos no free tier do local stack e configurar soluções paralelas aos que não estão:
+
+Serviços incluídos no free tier:
+
+*DynamoDB - Banco de dados NoSQL 
+*Kinesis - Streaming de dados em tempo real 
+*S3 - Armazenamento de objetos para data lakes 
+*Lambda - Processamento serverless de dados 
+
+*Serviços de Data Engineering que NÃO estão no free tier (requerem LocalStack Pro):
+*Glue - ETL e catálogo de dados 
+*Athena - Análise de dados com queries SQL 
+*EMR - Processamento de big data com Hadoop/Spark 
+*DMS - Database Migration Service 
+*MSK - Managed Streaming for Apache Kafka 
+*RDS - Bancos de dados relacionais 
+
+# Dúvida
+
+Mas ai vem a duvida, em um ambiente de produção usando nuvem, eu imagino que geralmente o banco de dados nao fica na vm ubuntu server 
+dentro de um container, eu iamgino que a nuvem tem serviços diferentes do ec2 por exemplo apra gerenciar banco de dados, 
+e o banco precisa estar rodando 24/7. 
+então imagino que meu ambiente nao está tão fidedigno assim com relação ao que encontrarei no mercado
+
+
+---> Verificar posteriormente:
+*LocalStack (roda aws localmente para testes)
+*uma das formas fidedignas para usar o banco de dados é com outra VM Ubuntu Server para simular banco na nuvem
