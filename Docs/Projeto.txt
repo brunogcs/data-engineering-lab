@@ -12,7 +12,7 @@ Não quero depender porque plano free de teste deles é limitado, eu quero ter u
 Eu já configurei meu ubuntu server.
 Eu já configurei meu vscode para conectar ao ubuntu server via ssh.
 Eu já configurei devcontainer com python para rodar no ubuntu server via ssh.
-Eu já configurei container para rodar o airflow
+Eu já configurei diversos containers para rodar o airflow (redis, airflow-webserver, airflow-scheduler, airflow-worker, airflow-init)
 Eu já configurei container postgres
 Eu já configurei o S3 no LocalStack para receber o arquivo e depois enviar metadados para o postgres
 
@@ -35,13 +35,8 @@ Serviços incluídos no free tier:
 
 # O que está nos planos de fazer:
 
-    * no proximo passo eu qeuria entender qual a forma padrão do mercado para os comntainers
-    , pelo que entendi toda vez que eu executar o código, ele deve subir o container e quando finalizar, deve descartar o container
-    , é isso mesmo?
-
-    * se for isso mesmo, no caso que estou hoje como funcionaria? colcoar arquivo pipeline.pys
-
-    *entender se após o uso do s3 eu excluo o arquivo de la
+    * corrigir arquivo pipeline_dage
+    * melhorar leitura de volume e script no postgre do compose
 
 
 # Dúvida
