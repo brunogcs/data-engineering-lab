@@ -1,4 +1,4 @@
-    FROM python:3.11
+FROM python:3.11-slim
 
 WORKDIR /workspace
 
@@ -9,11 +9,10 @@ RUN apt-get update && apt-get install -y \
     postgresql-client \
     && rm -rf /var/lib/apt/lists/*
 
-# Copiar e instalar requirements
+# Copiar requirements
 COPY requirements.txt .
-RUN pip install --no-cache-dir -r requirements.txt || echo "requirements.txt vazio ou não existe"
 
-# Instalar dependências do postCreateCommand
-RUN pip install --no-cache-dir pandas psycopg2-binary
+# Instalar dependências Python
+RUN pip install --no-cache-dir -r requirements.txt
 
 CMD ["bash"]

@@ -11,8 +11,9 @@ Não quero depender porque plano free de teste deles é limitado, eu quero ter u
 # O que Já fiz
 Eu já configurei meu ubuntu server.
 Eu já configurei meu vscode para conectar ao ubuntu server via ssh.
-Eu já configurei um projeto especifico para rodar em container python dentro do ubuntu server via ssh.
-Eu já configurei também container postgres para rodar meu código python que faz inserção nele.
+Eu já configurei devcontainer com python para rodar no ubuntu server via ssh.
+Eu já configurei container para rodar o airflow
+Eu já configurei container postgres
 Eu já configurei o S3 no LocalStack para receber o arquivo e depois enviar metadados para o postgres
 
 # O que posso e não posso usar no LocalStack
@@ -33,10 +34,18 @@ Serviços incluídos no free tier:
     *RDS - Bancos de dados relacionais 
 
 # O que está nos planos de fazer:
-* 
+
+    * no proximo passo eu qeuria entender qual a forma padrão do mercado para os comntainers
+    , pelo que entendi toda vez que eu executar o código, ele deve subir o container e quando finalizar, deve descartar o container
+    , é isso mesmo?
+
+    * se for isso mesmo, no caso que estou hoje como funcionaria? colcoar arquivo pipeline.pys
+
+    *entender se após o uso do s3 eu excluo o arquivo de la
+
 
 # Dúvida
-*
+    *
 
 ---> Verificar posteriormente:
-*
+    *

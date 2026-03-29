@@ -1,4 +1,15 @@
-#docker-compose up -d
+#parar os containers do docker
+#docker compose down
+
+#construir as imagens do docker sem precisar baixar novamente
+#docker compose build --no-cache airflow
+
+#levanta os containers do docker
+#docker compose up -d
+
+#Criar os bancos de dados que serão utilizados no postgres
+#docker exec -it data_lab_postgres psql -U data -d warehouse -c "CREATE DATABASE airflow;"
+
 version: "3.8"
 
 networks:
@@ -15,22 +26,91 @@ services:
       POSTGRES_DB: warehouse
     ports:
       - "5432:5432"
+    volumes:
+      - ./postgres:/docker-entrypoint-initdb.d
     networks:
       - data-network
 
-  airflow:
+  redis:
+    image: redis:7
+    container_name: data_lab_redis
+    networks:
+      - data-network
+
+  airflow-webserver:
     image: apache/airflow:2.7.1
-    container_name: data_lab_airflow
-    environment:
-      AIRFLOW__CORE__LOAD_EXAMPLES: 'False'
-      AIRFLOW__CORE__EXECUTOR: 'SequentialExecutor'
-      AIRFLOW__DATABASE__SQL_ALCHEMY_CONN: 'postgresql+psycopg2://data:data@postgres:5432/warehouse'
+    container_name: airflow_webserver
+    command: webserver
     ports:
       - "8080:8080"
+    environment:
+      AIRFLOW__CORE__EXECUTOR: CeleryExecutor
+      AIRFLOW__CORE__LOAD_EXAMPLES: 'False'
+      AIRFLOW__DATABASE__SQL_ALCHEMY_CONN: postgresql+psycopg2://data:data@postgres:5432/airflow
+      AIRFLOW__CELERY__BROKER_URL: redis://redis:6379/0
+      AIRFLOW__CELERY__RESULT_BACKEND: db+postgresql://data:data@postgres:5432/airflow
     volumes:
       - ./dags:/opt/airflow/dags
     depends_on:
       - postgres
+      - redis
+    networks:
+      - data-network
+
+  airflow-scheduler:
+    image: apache/airflow:2.7.1
+    container_name: airflow_scheduler
+    command: scheduler
+    environment:
+      AIRFLOW__CORE__EXECUTOR: CeleryExecutor
+      AIRFLOW__DATABASE__SQL_ALCHEMY_CONN: postgresql+psycopg2://data:data@postgres:5432/airflow
+      AIRFLOW__CELERY__BROKER_URL: redis://redis:6379/0
+      AIRFLOW__CELERY__RESULT_BACKEND: db+postgresql://data:data@postgres:5432/airflow
+    volumes:
+      - ./dags:/opt/airflow/dags
+    depends_on:
+      - postgres
+      - redis
+    networks:
+      - data-network
+
+  airflow-worker:
+    image: apache/airflow:2.7.1
+    container_name: airflow_worker
+    command: celery worker
+    environment:
+      AIRFLOW__CORE__EXECUTOR: CeleryExecutor
+      AIRFLOW__DATABASE__SQL_ALCHEMY_CONN: postgresql+psycopg2://data:data@postgres:5432/airflow
+      AIRFLOW__CELERY__BROKER_URL: redis://redis:6379/0
+      AIRFLOW__CELERY__RESULT_BACKEND: db+postgresql://data:data@postgres:5432/airflow
+    volumes:
+      - ./dags:/opt/airflow/dags
+    depends_on:
+      - postgres
+      - redis
+    networks:
+      - data-network
+
+  airflow-init:
+    image: apache/airflow:2.7.1
+    container_name: airflow_init
+    depends_on:
+      - postgres
+    entrypoint: /bin/bash
+    command: >
+      -c "
+      airflow db init &&
+      airflow users create
+        --username admin
+        --password admin
+        --firstname admin
+        --lastname user
+        --role Admin
+        --email admin@email.com
+      "
+    environment:
+      AIRFLOW__CORE__EXECUTOR: CeleryExecutor
+      AIRFLOW__DATABASE__SQL_ALCHEMY_CONN: postgresql+psycopg2://data:data@postgres:5432/airflow
     networks:
       - data-network
 
@@ -48,7 +128,6 @@ services:
       - PYTHONUNBUFFERED=1
     depends_on:
       - postgres
-      - airflow
       - localstack
     networks:
       - data-network
@@ -61,7 +140,6 @@ services:
     environment:
       - SERVICES=s3
       - DEBUG=1
-      - DATA_DIR=/var/lib/localstack/data
     volumes:
       - ./data:/var/lib/localstack
       - /var/run/docker.sock:/var/run/docker.sock

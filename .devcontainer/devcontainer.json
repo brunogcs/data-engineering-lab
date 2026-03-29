@@ -8,7 +8,9 @@
    "extensions": [
     "ms-python.python",
     "ms-python.vscode-pylance",
-    "Apache.airflow"
+    "Apache.airflow",
+    "cweijan.vscode-postgresql-client2",
+    "codeium.codeium"
    ]
   }
  }
