@@ -89,7 +89,8 @@ services:
       AIRFLOW__WEBSERVER__LIMITER_ENABLED: "True"
       AIRFLOW__WEBSERVER__LIMITER_STORAGE_URL: "redis://redis:6379/0"
     volumes:
-      - ./dags:/opt/airflow/dags
+      #- ./dags:/opt/airflow/dags
+      - /home/brunoserver/projetos/data-engineering-lab/dags:/opt/airflow/dags
     depends_on:
       - postgres
       - redis
@@ -106,7 +107,8 @@ services:
       AIRFLOW__CELERY__BROKER_URL: redis://redis:6379/0
       AIRFLOW__CELERY__RESULT_BACKEND: db+postgresql://data:data@postgres:5432/airflow
     volumes:
-      - ./dags:/opt/airflow/dags
+      #- ./dags:/opt/airflow/dags
+      - /home/brunoserver/projetos/data-engineering-lab/dags:/opt/airflow/dags
     depends_on:
       - postgres
       - redis
@@ -123,7 +125,8 @@ services:
       AIRFLOW__CELERY__BROKER_URL: redis://redis:6379/0
       AIRFLOW__CELERY__RESULT_BACKEND: db+postgresql://data:data@postgres:5432/airflow
     volumes:
-      - ./dags:/opt/airflow/dags
+      #- ./dags:/opt/airflow/dags
+      - /home/brunoserver/projetos/data-engineering-lab/dags:/opt/airflow/dags
     depends_on:
       - postgres
       - redis
@@ -150,17 +153,15 @@ services:
       - data-network
 
   localstack:
-  image: localstack/localstack:latest
-  container_name: localstack
-  ports:
-    - "4566:4566"
-  environment:
-    - SERVICES=s3
-    - DEBUG=1
-  volumes:
-    - ./data:/var/lib/localstack
-    - /var/run/docker.sock:/var/run/docker.sock
-  networks:
-    - data-network
-  command: >
-    sh -c "localstack start & sleep 5 && awslocal s3 mb s3://data-lake && wait"
+    image: localstack/localstack:latest
+    container_name: localstack
+    ports:
+      - "4566:4566"
+    environment:
+      - SERVICES=s3
+      - DEBUG=1
+    volumes:
+      - ./data:/var/lib/localstack
+      - /var/run/docker.sock:/var/run/docker.sock
+    networks:
+      - data-network
