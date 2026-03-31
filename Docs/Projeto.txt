@@ -35,7 +35,9 @@ Serviços incluídos no free tier:
 
 # O que está nos planos de fazer:
 
-    * corrigir arquivo pipeline_dage
+    * descobrir como acessar localhost:8080 , sendo que estou conectado com vscode no server ubuntu, e dentro do server que está esses container do airflow? 
+      preciso ter um broser instalado?
+    * se necessário corrigir arquivo pipeline_dag
     * melhorar leitura de volume e script no postgre do compose
 
 

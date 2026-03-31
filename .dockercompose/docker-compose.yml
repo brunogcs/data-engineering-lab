@@ -16,7 +16,12 @@ networks:
   data-network:
     external: true
 
+volumes:
+  redis_data:
+  postgres_data:
+
 services:
+
   postgres:
     image: postgres:15
     container_name: data_lab_postgres
@@ -27,7 +32,7 @@ services:
     ports:
       - "5432:5432"
     volumes:
-      #- ./postgres:/docker-entrypoint-initdb.d
+      - postgres_data:/var/lib/postgresql/data
       - /home/brunoserver/projetos/data-engineering-lab/.dockercompose/postgres:/docker-entrypoint-initdb.d
     networks:
       - data-network
@@ -35,6 +40,37 @@ services:
   redis:
     image: redis:7
     container_name: data_lab_redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    networks:
+      - data-network
+
+  airflow-init:
+    image: apache/airflow:2.7.1
+    container_name: airflow_init
+    depends_on:
+      - postgres
+      - redis
+    entrypoint: /bin/bash
+    command: >
+      -c "
+      airflow db init &&
+      airflow users list | grep admin || \
+      airflow users create \
+        --username admin \
+        --password admin \
+        --firstname admin \
+        --lastname user \
+        --role Admin \
+        --email admin@email.com
+      "
+    environment:
+      AIRFLOW__CORE__EXECUTOR: CeleryExecutor
+      AIRFLOW__DATABASE__SQL_ALCHEMY_CONN: postgresql+psycopg2://data:data@postgres:5432/airflow
+      AIRFLOW__CELERY__BROKER_URL: redis://redis:6379/0
+      AIRFLOW__CELERY__RESULT_BACKEND: db+postgresql://data:data@postgres:5432/airflow
     networks:
       - data-network
 
@@ -50,6 +86,8 @@ services:
       AIRFLOW__DATABASE__SQL_ALCHEMY_CONN: postgresql+psycopg2://data:data@postgres:5432/airflow
       AIRFLOW__CELERY__BROKER_URL: redis://redis:6379/0
       AIRFLOW__CELERY__RESULT_BACKEND: db+postgresql://data:data@postgres:5432/airflow
+      AIRFLOW__WEBSERVER__LIMITER_ENABLED: "True"
+      AIRFLOW__WEBSERVER__LIMITER_STORAGE_URL: "redis://redis:6379/0"
     volumes:
       - ./dags:/opt/airflow/dags
     depends_on:
@@ -92,29 +130,6 @@ services:
     networks:
       - data-network
 
-  airflow-init:
-    image: apache/airflow:2.7.1
-    container_name: airflow_init
-    depends_on:
-      - postgres
-    entrypoint: /bin/bash
-    command: >
-      -c "
-      airflow db init &&
-      airflow users create
-        --username admin
-        --password admin
-        --firstname admin
-        --lastname user
-        --role Admin
-        --email admin@email.com
-      "
-    environment:
-      AIRFLOW__CORE__EXECUTOR: CeleryExecutor
-      AIRFLOW__DATABASE__SQL_ALCHEMY_CONN: postgresql+psycopg2://data:data@postgres:5432/airflow
-    networks:
-      - data-network
-
   devcontainer:
     build:
       context: .
@@ -135,15 +150,17 @@ services:
       - data-network
 
   localstack:
-    image: localstack/localstack:latest
-    container_name: localstack
-    ports:
-      - "4566:4566"
-    environment:
-      - SERVICES=s3
-      - DEBUG=1
-    volumes:
-      - ./data:/var/lib/localstack
-      - /var/run/docker.sock:/var/run/docker.sock
-    networks:
-      - data-network
+  image: localstack/localstack:latest
+  container_name: localstack
+  ports:
+    - "4566:4566"
+  environment:
+    - SERVICES=s3
+    - DEBUG=1
+  volumes:
+    - ./data:/var/lib/localstack
+    - /var/run/docker.sock:/var/run/docker.sock
+  networks:
+    - data-network
+  command: >
+    sh -c "localstack start & sleep 5 && awslocal s3 mb s3://data-lake && wait"
